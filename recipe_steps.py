@@ -3,7 +3,7 @@ from enumerator import *
 STEPS = 10
 LENGTH = num_actions + 2 + num_ingredients
 NUM_IDX = STEPS * LENGTH
-max_seconds = 60 * 60 * 8
+max_seconds = 36000
 
 def write_steps(float_array):
 	step_list = []
