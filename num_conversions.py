@@ -2,6 +2,15 @@ import torch
 import requests
 from fractions import Fraction
 from bs4 import BeautifulSoup
+import numpy as np
+
+global lbs_to_cups 
+global ozs_to_cups
+global cans_to_cups 
+global heads_to_cups
+global teasp_to_cups
+global tablesp_to_cups
+global max_cups
 
 ingredients_file = open("ingredients.txt","r")
 
@@ -38,7 +47,7 @@ for line in ingredients_file.readlines():
     for ingredient in ingredients:
         subingredients = ingredient.split(' ')
         temp = 0 #storing variable
-        conversion = -1 #what we want
+        conversion = 0 #what we want
         #case, example: 2 2/3 teaspoons of water... should handle 2 2/3 (units) and 2 (units)
         # handles a integer as the first index
         if len(subingredients[0]) == 1 and subingredients[0].isdigit:
@@ -104,10 +113,12 @@ for line in ingredients_file.readlines():
                     conversion = temp * tablesp_to_cups
                     conversions.append(conversion)
 
-                            
-
-        
-
-
+                  
+max_cups = 12.375
+normalized_conversions = []
+i = 0
+while i < len(conversions):
+    normalized_conversions.append(conversions[i] / max_cups)
+    i += 1
 
 
