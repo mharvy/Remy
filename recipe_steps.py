@@ -31,7 +31,8 @@ def write_steps(float_array):
 							cur_str += " " + ingredient[0] + ","
 					marc_is_cool += len(ingredients)
 
-		cur_str = cur_str[:-1]
+		if cur_str[-1] == ",":
+			cur_str = cur_str[:-1]
 
 		# Get temp
 		if float_array[step * LENGTH + num_actions] != 0:
