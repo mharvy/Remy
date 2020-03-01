@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 import heapq
 
 
-
-
 def worm(starting_URL):
 	URLs = [starting_URL]
 	visited = set()
