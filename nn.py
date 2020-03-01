@@ -12,11 +12,11 @@ from enumerator import num_ingredients
 
 
 # num_ingredients = total types of ingredients
+# num_actions = total number of actions
 INGREDIENTS = 10
 STEPS = 10
-NUM_FEATURES = INGREDIENTS * 3 + STEPS * (3 + num_ingredients)
+NUM_FEATURES = INGREDIENTS * 3 + STEPS * (num_actions + 2 + num_ingredients)
 NUM_INPUTS = 10
-print(NUM_FEATURES)
 
 
 class Discriminator(nn.Module):
