@@ -33,7 +33,12 @@ def write_steps(float_array):
 
 		# Get temp
 		if float_array[step * LENGTH + num_actions] != 0:
-			cur_str += "at " + str(float_array[step * LENGTH + num_actions] * 1100) + " degrees Fahrenheit "
+			temp = ""
+			temp_int = int(float_array[step * LENGTH + num_actions] * 1100)
+			for t in temp_.items():
+				if t[1] == temp_int:
+					temp = t[0]
+			cur_str += "at " + temp + " degrees Fahrenheit "
 
 		# Get time
 		if float_array[step * LENGTH + num_actions + 1] != 0:
