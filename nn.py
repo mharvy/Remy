@@ -5,17 +5,19 @@
 
 import numpy as np
 import torch
-from torch import nn, optim
+from torch import nn, optim, utils
 from time import gmtime, strftime
 from math import sqrt
-from enumerator import num_ingredients
+from enumerator import num_ingredients, num_actions
+from recipe_steps import write_steps
+from 
 
 
 # num_ingredients = total types of ingredients
 # num_actions = total number of actions
 INGREDIENTS = 10
 STEPS = 10
-NUM_FEATURES = INGREDIENTS * 3 + STEPS * (num_actions + 2 + num_ingredients)
+NUM_FEATURES = INGREDIENTS * (86) + STEPS * (num_actions + 2 + num_ingredients)
 NUM_INPUTS = 10
 
 
@@ -24,15 +26,14 @@ class Discriminator(nn.Module):
 		super(Discriminator, self).__init__()
 
 		self.main = nn.Sequential(
-			nn.LeakyReLU(),
 			nn.Linear(NUM_FEATURES, NUM_FEATURES // 2),
 			nn.LeakyReLU(),
 			nn.Linear(NUM_FEATURES // 2, NUM_FEATURES // 4),
 			nn.LeakyReLU(),
 			nn.Linear(NUM_FEATURES // 4, NUM_FEATURES // 8),
 			nn.LeakyReLU(),
-			nn.Linear(NUM_FEATURES // 8, 2),
-			nn.LeakyReLU()
+			nn.Linear(NUM_FEATURES // 8, 1),
+			nn.Sigmoid()
 		)
 
 	def forward(self, input):
@@ -58,7 +59,8 @@ class Generator(nn.Module):
 		return self.main(input)
 
 
-def fit(lr, epochs, stats_interval, recipe_inteval):
+def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size):
+
 	if torch.cuda.is_available():
 		device = torch.device("cuda")
 	else:
@@ -68,32 +70,50 @@ def fit(lr, epochs, stats_interval, recipe_inteval):
 	generator = Generator().to(device)
 
 	criterion = nn.BCELoss()
+	fixed_noise = torch.randn(10, device=device)
 
-	real = 1
-	fake = 0
+	real_label = 1
+	fake_label = 0
 
 	optimizerD = optim.Adam(discriminator.parameters(), lr=lr, weight_decay=0)
-	optimizerG = optim.Adam(generator.parameters(), lr=lr, weight_decay=0)m
+	optimizerG = optim.Adam(generator.parameters(), lr=lr, weight_decay=0)
 
 	d_losses = []
 	g_losses = []
 	recipe_list = []
 	iters = 0
 
+	train_set = torch.zeros(10000, 4440)
+	with open(train_file, "r") as file:
+		i = 0
+		for line in file.readlines():
+			values = line.split(",")
+			for j in range(4440):
+				train_set[i, j] = float(values[j])
+			i += 1 
+
+	#print(train_set)
+
 	print("Starting Training")
 	for epoch in range(epochs):
-		for num, data in enumerate(file, 0):
+
+		train_loader = utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
+		#print(train_loader)
+
+		for num, data in enumerate(train_loader, 0):
+			#print(data)
+
 			### Update discriminator
 
 			# Train with real batch
 			discriminator.zero_grad()
-			real_dev = data[0].to(device)
-			batch_size = real_cpu.size(0)
+			#real_dev = data[0].to(device)
+			#batch_size = real_dev.size(0)
 
 			# These will both have a length of batch_size
-			label = torch.full((batch_size,), real, device=device)
+			label = torch.full((batch_size,), real_label, device=device)
 			output = discriminator(data).view(-1)
-			
+
 			error_d_real = criterion(output, label)
 			error_d_real.backward()
 			D_x = output.mean().item()
@@ -102,7 +122,7 @@ def fit(lr, epochs, stats_interval, recipe_inteval):
 			noise = torch.randn(batch_size, 10)
 			fake_out = generator(noise)
 			
-			label.fill_(fake)
+			label.fill_(fake_label)
 			output = discriminator(fake_out.detach()).view(-1)  # This part is pretty key
 
 			error_d_fake = criterion(output, label)
@@ -116,9 +136,9 @@ def fit(lr, epochs, stats_interval, recipe_inteval):
 			### Update generator
 
 			generator.zero_grad()
-			label.fill_(real)
+			label.fill_(real_label)
 
-			output = discrinator(fake_out).view(-1)
+			output = discriminator(fake_out).view(-1)
 
 			error_g = criterion(output, label)
 			error_g.backward()
@@ -139,13 +159,16 @@ def fit(lr, epochs, stats_interval, recipe_inteval):
 			if iters % recipe_inteval == 0:
 				with torch.no_grad():
 					fake = generator(fixed_noise).detach().cpu()
+				fake_floats = fake.tolist()
+				print(write_steps(fake_floats[:86]))
+				print(write_steps(fake_floats[86:]))
 				recipe_list.append(fake)
 
 			iters += 1
 
 
 def main():
-	fit()
+	fit(0.001, 20, 20, 100, "ex.txt", 50)
 
 
 if __name__ == "__main__":
