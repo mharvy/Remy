@@ -106,7 +106,6 @@ def recipe_ingredients():
     recipe_info = [] # 3 things for each ingredient: (attrib, id, amount)
 
     lines = ingredients_file.readlines()
-    bad = 0
 
     #conversions
     lbs_to_cups = 2.25
@@ -115,8 +114,6 @@ def recipe_ingredients():
     heads_to_cups = 3.5
     teasp_to_cups = 0.0208333
     tablesp_to_cups = 0.0625
-
-    conversions = []
 
     for line in lines:
         ingredients = line.split('~')[:-1]
@@ -131,24 +128,29 @@ def recipe_ingredients():
             conversion = 0 #what we want
             #case, example: 2 2/3 teaspoons of water... should handle 2 2/3 (units) and 2 (units)
             # handles a integer as the first index
-            if len(sub_ingredients[0]) == 1 and sub_ingredients[0].isdigit:
+            starts_with_number = 1
+            for c in sub_ingredients[0]:
+                if not c.isdigit():
+                    starts_with_number = 0
+            if len(sub_ingredients[0]) >= 1 and starts_with_number:
                 temp += int(sub_ingredients[0])
                 # handles fractions
-                if len(sub_ingredients[1]) == 3:
-                    if sub_ingredients[1][0].isdigit and sub_ingredients[1][1] == '/' and sub_ingredients[1][2].isdigit:
-                        temp += float(Fraction(sub_ingredients[1][:]))
+                if len(sub_ingredients) > 1: # if theres a second element, lets analyze
+                    # if #/#
+                    if len(sub_ingredients[1]) == 3 and sub_ingredients[1][0].isdigit and sub_ingredients[1][1] == '/' and sub_ingredients[1][2].isdigit:
+                        temp += float(Fraction(sub_ingredients[1]))
                         #conversions take place where, find the unit that follows the integer index 0 and fraction index 1
-                        if "pound" in sub_ingredients[2] or "pounds" in sub_ingredients[2]:
+                        if sub_ingredients[2] == "pound" or sub_ingredients[2] == "pounds" or sub_ingredients[2] == "lb." or sub_ingredients[2] == "lb" or sub_ingredients[2] == "lbs" or sub_ingredients[2] == "lbs":
                             conversion = temp * lbs_to_cups
-                        elif "ounce" in sub_ingredients[2] or "ounces" in sub_ingredients[2]:
+                        elif sub_ingredients[2] == "ounce" or sub_ingredients[2] == "ounces" or sub_ingredients[2] == "oz" or sub_ingredients[2] == "oz.":
                             conversion = temp * ozs_to_cups
-                        elif "head" in sub_ingredients[2] or "heads" in sub_ingredients[2]:
+                        elif sub_ingredients[2] == "head" or sub_ingredients[2] == "heads":
                             conversion = temp * heads_to_cups
-                        elif "teaspoon" in sub_ingredients[2] or "teaspoons" in sub_ingredients[2]:
+                        elif sub_ingredients[2] == "teaspoon" or sub_ingredients[2] == "teaspoons" or sub_ingredients[2] == "tsp" or sub_ingredients[2] == "tsp.":
                             conversion = temp * teasp_to_cups
-                        elif "tablespoon" in sub_ingredients[2] or "tablespoons" in sub_ingredients[2]:
+                        elif sub_ingredients[2] == "tablespoon" or sub_ingredients[2] == "tablespoons" or sub_ingredients[2] == "tbspn":
                             conversion = temp * tablesp_to_cups
-                        elif "cup" in sub_ingredients[2] or "cups" in sub_ingredients[2]:
+                        elif sub_ingredients[2] == "cup" or sub_ingredients[2] == "cups":
                             conversion = temp
                     #handles the special cases of the (xx ounces)
                     elif sub_ingredients[1][0] == '(' and len(sub_ingredients[1]) == 3:
@@ -164,21 +166,41 @@ def recipe_ingredients():
                     elif sub_ingredients[1][0] == '(' and len(sub_ingredients[1]) == 6:
                             temp = float(sub_ingredients[1][2:6])
                             conversion = temp * ozs_to_cups
-            #handles the fraction as the first index
-            elif len(sub_ingredients[0]) == 3:
-                if sub_ingredients[0][0].isdigit and sub_ingredients[0][1] == '/' and sub_ingredients[0][2].isdigit:
-                    temp += float(Fraction(sub_ingredients[0][:]))
-                    #check to see what the units that follow the fraction from index of 0
-                    if "pound" in sub_ingredients[1] or "pounds" in sub_ingredients[1]:
+                    # handles case where it is just 1 tablespoon, etc
+                    elif sub_ingredients[1] == "pound" or sub_ingredients[1] == "pounds" or sub_ingredients[1] == "lb." or sub_ingredients[1] == "lb" or sub_ingredients[1] == "lbs" or sub_ingredients[1] == "lbs":
                         conversion = temp * lbs_to_cups
-                    elif "ounce" in sub_ingredients[1] or "ounces" in sub_ingredients[1]:
+                    elif sub_ingredients[1] == "ounce" or sub_ingredients[1] == "ounces" or sub_ingredients[1] == "oz" or sub_ingredients[1] == "oz.":
                         conversion = temp * ozs_to_cups
-                    elif "head" in sub_ingredients[1] or "heads" in sub_ingredients[1]:
+                    elif sub_ingredients[1] == "head" or sub_ingredients[1] == "heads":
                         conversion = temp * heads_to_cups
-                    elif "teaspoon" in sub_ingredients[1] or "teaspoons" in sub_ingredients[1]:                        
+                    elif sub_ingredients[1] == "teaspoon" or sub_ingredients[1] == "teaspoons" or sub_ingredients[1] == "tsp" or sub_ingredients[1] == "tsp.":
                         conversion = temp * teasp_to_cups
-                    elif "tablespoon" in sub_ingredients[1] or "tablespoons" in sub_ingredients[1]:
+                    elif sub_ingredients[1] == "tablespoon" or sub_ingredients[1] == "tablespoons" or sub_ingredients[1] == "tbspn":
                         conversion = temp * tablesp_to_cups
+                    elif sub_ingredients[1] == "cup" or sub_ingredients[1] == "cups":
+                        conversion = temp
+                    # otherwise you have one/two/tree whole:
+                    else:
+                        conversion = -temp
+            #handles the fraction as the first index
+            elif len(sub_ingredients[0]) == 3 and len(sub_ingredients) > 1 and sub_ingredients[0][0].isdigit and sub_ingredients[0][1] == '/' and sub_ingredients[0][2].isdigit:
+                temp += float(Fraction(sub_ingredients[0]))
+                #check to see what the units that follow the fraction from index of 0
+                if sub_ingredients[1] == "pound" or sub_ingredients[1] == "pounds" or sub_ingredients[1] == "lb." or sub_ingredients[1] == "lb" or sub_ingredients[1] == "lbs" or sub_ingredients[1] == "lbs":
+                    conversion = temp * lbs_to_cups
+                elif sub_ingredients[1] == "ounce" or sub_ingredients[1] == "ounces" or sub_ingredients[1] == "oz" or sub_ingredients[1] == "oz.":
+                    conversion = temp * ozs_to_cups
+                elif sub_ingredients[1] == "head" or sub_ingredients[1] == "heads":
+                    conversion = temp * heads_to_cups
+                elif sub_ingredients[1] == "teaspoon" or sub_ingredients[1] == "teaspoons" or sub_ingredients[1] == "tsp" or sub_ingredients[1] == "tsp.":
+                    conversion = temp * teasp_to_cups
+                elif sub_ingredients[1] == "tablespoon" or sub_ingredients[1] == "tablespoons" or sub_ingredients[1] == "tbspn":
+                    conversion = temp * tablesp_to_cups
+                elif sub_ingredients[1] == "cup" or sub_ingredients[1] == "cups":
+                    conversion = temp
+                # otherwise you have one half whole
+                else:
+                    conversion = -temp
             ingredient_info[2] = conversion
             # end ben code
 
@@ -218,10 +240,10 @@ def recipe_ingredients():
             if ingredient_info[0] == -1:
                 recipe_valid = 0
                 break
-            print(ingredient)
-            print(ingredient_info)
+            #print(ingredient)
+            #print(ingredient_info)
             recipe.append(ingredient_info)
-        print("\n")
+        #print("\n")
         if recipe_valid:
             recipe_info.append(recipe)
     """
@@ -236,14 +258,18 @@ def recipe_ingredients():
     """
     return recipe_info
 
+
+    
+"""
 def main():
     a = recipe_ingredients()
-    #b = recipe_steps()
-    #for steps in b:
-    #    for step in steps:
-    #        print(step)
-    #    print('\n')
+    b = recipe_steps()
+    for steps in b:
+        for step in steps:
+            print(step)
+        print('\n')
     print('done.')
 
 if __name__ == "__main__":
     main()
+"""
