@@ -8,9 +8,9 @@ import torch
 from torch import nn, optim, utils
 from time import gmtime, strftime
 from math import sqrt
-from enumerator import num_ingredients, num_actions
+from enumerator2 import num_ingredients, num_actions
 from recipe_steps import write_steps
-from 
+from recipe_ingredients import write_ingredients
 
 
 # num_ingredients = total types of ingredients
@@ -59,7 +59,7 @@ class Generator(nn.Module):
 		return self.main(input)
 
 
-def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size):
+def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_file):
 
 	if torch.cuda.is_available():
 		device = torch.device("cuda")
@@ -160,15 +160,19 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size):
 				with torch.no_grad():
 					fake = generator(fixed_noise).detach().cpu()
 				fake_floats = fake.tolist()
-				print(write_steps(fake_floats[:86]))
-				print(write_steps(fake_floats[86:]))
+				with open(out_file, "w") as outf:
+					s = ""
+					for f in fake_floats:
+						s += str(f) + ", "
+					outf.write(s[:-2] + "\n")
+
 				recipe_list.append(fake)
 
 			iters += 1
 
 
 def main():
-	fit(0.001, 20, 20, 100, "ex.txt", 50)
+	fit(0.001, 20, 20, 100, "ex.txt", 50, "out.txt")
 
 
 if __name__ == "__main__":
