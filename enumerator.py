@@ -12,13 +12,15 @@ sugar_products = {"brown sugar":0,"sugar candy":1,"confectionary sugar":2,"powde
 nuts_oils = {"canola oil":0,"cooking spray":1,"chia seeds":2,"hazelnut":3,"pine nuts":4,"mustard oil":5,"sunflower seeds":6,"sesame oil":7,"pistachio":8,"olive oil":9,"mustard seeds":10,"poppy seeds":11,"sesame seeds":12,"peanuts":13,"chironji":14,"cashew":15,"almond":16,"walnuts":17,"walnunts":18,"pecan":19,"baking spray":20}
 other = {"almond milk":0,"red wine":1,"vinegar":2,"white wine":3,"soy milk":4,"yeast":5,"white pepper":6,"rice vinegar":7,"sea salt":8,"hoisin sauce":9,"malt vinegar":10,"chocolate chips":11,"quinoa":12,"baking powder":13,"baking soda":14,"rice flour":15,"wheat flour":16,"oyster sauce":17,"teriyaki":18,"soy sauce":19,"noodle":20,"pasta":21,"lasagne":22,"spaghetti":23,"macaroni":24,"rigatoni":25,"ravioli":26,"penne":27,"balsamic vinegar":28,"coconut oil":29,"rice noodles":30,"coffee":31,"beer":32,"chocolate":33,"sake":34,"vinaigrette":35,"vanilla":36,"tortilla":37,"tomato puree":38,"vegetable oil":39,"sharbat":40,"rum":41,"paan":42,"meringue":43,"mayonnaise":44,"melon seeds":45,"lotus seeds":46,"jelly":47,"gold leaves":48,"glycerine":49,"gelatin":50,"fish sauce":51,"cranberry sauce":52,"cornflour":53,"cognac":54,"coconut water":55,"coconut milk":56,"cocoa":57,"tea":58,"brown sauce":59,"tofu":60,"egg":61,"marzipan":62,"agar":63,"peanut butter":64,"flax seed":65,"water":66,"ice":67,"protein powder":68,"cornstarch":69,"roll":70,"worcestershire sauce":71,"pancake mix":72,"marshmellow":73,"barbeque sauce":74}
 
+actions = {"fill":0,"preheat":1,"place":2,"mix":3,"cook":4,"garnish":5,"stir":6,"pulse":7,"puree":8,"season":9,"spread":10,"serve":11,"cover":12,"bake":13,"arrange":14,"lay":15,"sprinkle":16,"drizzle":17,"toss":18,"coat":19,"flip":20,"heat":21,"drop":22,"whisk":23,"form":24,"turn":25,"pour":26,"punch":27,"scoop":28,"beat":29,"refrigerate":30,"combine":31,"blend":32,"brush":33,"roll":34,"cool":35,"add":36,"spray":37,"simmer":38,"chill":39,"break":40}
+
 # array of all ingredients dictionaries
 all_ingredients = [vegetables, spices_herbs, cereals_pulses, meats, dairy, fruits, seafood, sugar_products, nuts_oils, other]
 num_ingredients = sum(len(s) for s in all_ingredients)
+num_actions = len(actions)
 
 def recipes():
     foodtypes = ['vegetables', 'spices_herbs', 'cereals_pulses', 'meats', 'dairy', 'fruits', 'seafood', 'sugar_products', 'nuts_oils', 'other']
-    actions = {"fill":0,"preheat":1,"place":2,"mix":3,"cook":4,"garnish":5,"stir":6,"pulse":7,"puree":8,"season":9,"spread":10,"serve":11,"cover":12,"bake":13,"arrange":14,"lay":15,"sprinkle":16,"drizzle":17,"toss":18,"coat":19,"flip":20,"heat":21,"drop":22,"whisk":23,"form":24,"turn":25,"pour":26,"punch":27,"scoop":28,"beat":29,"refrigerate":30,"combine":31,"blend":32,"brush":33,"roll":34,"cool":35,"add":36,"spray":37,"simmer":38,"chill":39,"break":40}
     temp_ = {'300':300,'325':325,'350':350,'375':375,'400':400,'425':425,'450':450,'475':475,'500':500,'525':525,'550':550,'medium-high':1000, 'high heat':1100, 'medium heat':900, 'low heat':700,'medium-low':800}
     time_units = ['second','seconds','minute','minutes','hour','hours']
 
@@ -29,11 +31,19 @@ def recipes():
     steps_file = open("steps.txt","r")
     lines = ingredients_file.readlines()
     lines2 = steps_file.readlines()
-    
+
+    # print first recipe
+    ingreds_1 = lines[0].split('~')[:-1]
+    for ingredd in ingreds_1:
+        print(ingredd)
+    print('\n')
+    steps_1 = lines2[0].split('@')[:-1]
+    for stepp in steps_1:
+        print(stepp)
 
     # big poppas
     recipe_info = [] # 3 things for each ingredient: (attrib, id, amount)
-    recipe_step_info = [] # 38X entires
+    recipe_step_info = [] # returns []
 
     #conversions
     lbs_to_cups = 2.25
@@ -43,7 +53,7 @@ def recipes():
     teasp_to_cups = 0.0208333
     tablesp_to_cups = 0.0625
 
-    for line_i in range(len(lines)):
+    for line_i in range(2):
         ingredients = lines[line_i].split('~')[:-1]
 
         steps = lines2[line_i].split('@')[:-1]
