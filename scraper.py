@@ -22,6 +22,7 @@ def worm(starting_URL):
 			result = requests.get(URL)
 		except:
 			print("Request was denied :(")
+			sleep(10)
 			continue
 		
 		src = result.content
