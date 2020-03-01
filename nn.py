@@ -72,7 +72,7 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 	generator = Generator().to(device)
 
 	criterion = nn.BCELoss()
-	fixed_noise = torch.randn(10, device=device)
+	fixed_noise = torch.randn(10, device=device).cuda()
 
 	real_label = 1
 	fake_label = 0
@@ -85,16 +85,19 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 	recipe_list = []
 	iters = 0
 
-	train_set = torch.zeros(10000, 4440)
+	train_set = torch.zeros(1000, 4440)
 	with open(train_file, "r") as file:
 		i = 0
 		for line in file.readlines():
+			if i > 1000:
+				break
 			values = line.split(",")
 			for j in range(4440):
 				train_set[i, j] = float(values[j])
 			i += 1 
 
 	#print(train_set)
+	train_set = train_set.cuda()
 
 	print("Starting Training")
 	for epoch in range(epochs):
@@ -121,7 +124,7 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 			D_x = output.mean().item()
 
 			# Train with fake batch
-			noise = torch.randn(batch_size, 10)
+			noise = torch.randn(batch_size, 10).cuda()
 			fake_out = generator(noise)
 			
 			label.fill_(fake_label)
@@ -209,13 +212,15 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 						s += str(float(f)) + ", "
 					outf.write(s[:-2] + "\n")
 
+				torch.save(generator, "remy.pt")
+
 				recipe_list.append(t)
 
 			iters += 1
 
 
 def main():
-	fit(0.001, 20, 20, 20, "ex.txt", 50, "out.txt")
+	fit(0.000001, 60, 20, 20, "marcs_NN_data.txt", 50, "out.txt")
 
 
 if __name__ == "__main__":
