@@ -52,11 +52,13 @@ class Generator(nn.Module):
 			nn.Linear(NUM_FEATURES // 4, NUM_FEATURES // 2),
 			nn.LeakyReLU(),
 			nn.Linear(NUM_FEATURES // 2, NUM_FEATURES),
-			nn.LeakyReLU()
+			nn.Sigmoid()
 		)
 
 	def forward(self, input):
-		return self.main(input)
+		output = self.main(input)
+		return output
+
 
 
 def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_file):
@@ -158,21 +160,62 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 
 			if iters % recipe_inteval == 0:
 				with torch.no_grad():
-					fake = generator(fixed_noise).detach().cpu()
-				fake_floats = fake.tolist()
-				with open(out_file, "w") as outf:
+					t = generator(fixed_noise).detach().cpu()
+					m = []
+					s = []
+					for i in range(10):
+						idx = 0
+						m.append(0)
+						while idx < 10:
+							f = t[i * 86 + idx]
+							if f > t[m[-1]]:
+								m[-1] = i * 86 + idx
+							idx +=1
+						m.append(0)
+						while idx < 85 and idx >= 10:
+							f = t[i * 86 + idx]
+							if f > t[m[-1]]:
+								m[-1] = i * 86 + idx
+							idx += 1
+							s.append(86 * i - 1)
+					for i in range(10):
+						idx = 0
+						m.append(0)
+						while idx < num_actions:
+							f = t[10 * 86 + i * (num_actions + 2 + num_ingredients) + idx]
+							if f > t[m[-1]]:
+								m[-1] = 10 * 86 + i * (num_actions + 2 + num_ingredients) + idx
+							idx += 1
+						s.append(86 * 10 + (num_actions + 2 + num_ingredients) * i + num_actions)
+						s.append(86 * 10 + (num_actions + 2 + num_ingredients) * i + num_actions + 1)
+						m.append(0)
+						while idx < (num_actions + 2 + num_ingredients) and idx > (num_actions + 2):
+							f = t[10 * 86 + i * (num_actions + 2 + num_ingredients) + idx]
+							if f > t[m[-1]]:
+								m[-1] = 10 * 86 + i * (num_actions + 2 + num_ingredients) + idx
+							idx += 1
+	
+					for i in range(len(t)):
+						if i not in m and i not in s:
+							t[i] = float(0)
+						elif i in m:
+							t[i] = float(1)
+
+					print(t)
+
+				with open(out_file, "a") as outf:
 					s = ""
-					for f in fake_floats:
-						s += str(f) + ", "
+					for f in t:
+						s += str(float(f)) + ", "
 					outf.write(s[:-2] + "\n")
 
-				recipe_list.append(fake)
+				recipe_list.append(t)
 
 			iters += 1
 
 
 def main():
-	fit(0.001, 20, 20, 100, "ex.txt", 50, "out.txt")
+	fit(0.001, 20, 20, 20, "ex.txt", 50, "out.txt")
 
 
 if __name__ == "__main__":
