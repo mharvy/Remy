@@ -1,3 +1,8 @@
+################################################################################################
+# Remy
+# This file is HEAVILY based on https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
+################################################################################################
+
 import numpy as np
 import torch
 from torch import nn, optim
