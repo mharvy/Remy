@@ -56,12 +56,10 @@ seafood = {"shrimp":0,"tuna fish":1,"shellfish":2,"shark":3,"'sardine":4,"salmon
 sugar_products = {"brown sugar":0,"sugar candy":1,"confectionary sugar":2,"powdered sugar":3,"icing sugar":4,"honey":5,"jaggery":6,"syrup":7,"sugar":8,"cane sugar":9,"caramel":10,"castor sugar":11,"white sugar":12}
 nuts_oils = {"canola oil":0,"cooking spray":1,"chia seeds":2,"hazelnut":3,"pine nuts":4,"mustard oil":5,"sunflower seeds":6,"sesame oil":7,"pistachio":8,"olive oil":9,"mustard seeds":10,"poppy seeds":11,"sesame seeds":12,"peanuts":13,"chironji":14,"cashew":15,"almond":16,"walnuts":17,"walnunts":18,"pecan":19,"baking spray":20}
 other = {"almond milk":0,"red wine":1,"vinegar":2,"white wine":3,"soy milk":4,"yeast":5,"white pepper":6,"rice vinegar":7,"sea salt":8,"hoisin sauce":9,"malt vinegar":10,"chocolate chips":11,"quinoa":12,"baking powder":13,"baking soda":14,"rice flour":15,"wheat flour":16,"oyster sauce":17,"teriyaki":18,"soy sauce":19,"noodle":20,"pasta":21,"lasagne":22,"spaghetti":23,"macaroni":24,"rigatoni":25,"ravioli":26,"penne":27,"balsamic vinegar":28,"coconut oil":29,"rice noodles":30,"coffee":31,"beer":32,"chocolate":33,"sake":34,"vinaigrette":35,"vanilla":36,"tortilla":37,"tomato puree":38,"vegetable oil":39,"sharbat":40,"rum":41,"paan":42,"meringue":43,"mayonnaise":44,"melon seeds":45,"lotus seeds":46,"jelly":47,"gold leaves":48,"glycerine":49,"gelatin":50,"fish sauce":51,"cranberry sauce":52,"cornflour":53,"cognac":54,"coconut water":55,"coconut milk":56,"cocoa":57,"tea":58,"brown sauce":59,"tofu":60,"egg":61,"marzipan":62,"agar":63,"peanut butter":64,"flax seed":65,"water":66,"ice":67,"protein powder":68,"cornstarch":69,"roll":70,"worcestershire sauce":71,"pancake mix":72,"marshmellow":73,"barbeque sauce":74}
+all_ingredients = [vegetables, spices_herbs, cereals_pulses, meats, dairy, fruits, seafood, sugar_products, nuts_oils, other]
+num_ingredients = sum(len(s) for s in all_ingredients)
 
 def recipe_ingredients():
-    # array of all ingredients dictionaries
-    all_ingredients = [vegetables, spices_herbs, cereals_pulses, meats, dairy, fruits, seafood, sugar_products, nuts_oils, other]
-    num_ingredients = sum(len(s) for s in all_ingredients)
-
     foodtypes = ['vegetables', 'spices_herbs', 'cereals_pulses', 'meats', 'dairy', 'fruits', 'seafood', 'sugar_products', 'nuts_oils', 'other']
 
     ingredients_file = open("ingredients.txt","r")
