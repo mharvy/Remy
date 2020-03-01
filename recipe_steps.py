@@ -1,9 +1,8 @@
-from enumerator import *
+from enumerator2 import *
 
 STEPS = 10
 LENGTH = num_actions + 2 + num_ingredients
 NUM_IDX = STEPS * LENGTH
-max_seconds = 36000
 
 def write_steps(float_array):
 	step_list = []
@@ -25,7 +24,7 @@ def write_steps(float_array):
 		for i in range(num_ingredients):
 			if float_array[step * LENGTH + num_actions + 2 + i] == 1:
 				marc_is_cool = 0
-				for ingredients in all_ingredients:
+				for ingredients in ingredients_list:
 					for ingredient in ingredients.items():
 						if (ingredient[1] + marc_is_cool) == i:
 							cur_str += " " + ingredient[0] + ","
@@ -37,8 +36,8 @@ def write_steps(float_array):
 		# Get temp
 		if float_array[step * LENGTH + num_actions] != 0:
 			temp = ""
-			temp_int = int(float_array[step * LENGTH + num_actions] * 1100)
-			for t in temp_.items():
+			temp_int = int(float_array[step * LENGTH + num_actions] * MAX_TEMPERATURE)
+			for t in temperatures.items():
 				if t[1] == temp_int:
 					temp = t[0]
 			if temp not in ["medium-high", "high heat", "medium heat", "low heat", "medium-low"]:
@@ -49,14 +48,14 @@ def write_steps(float_array):
 
 		# Get time
 		if float_array[step * LENGTH + num_actions + 1] != 0:
-			cur_str += " for " + str(float_array[step * LENGTH + num_actions + 1] * max_seconds // 60) + " minutes"
+			cur_str += " for " + str(float_array[step * LENGTH + num_actions + 1] * MAX_TIME // 60) + " minutes"
 
 
 		step_list.append(cur_str + ".")
 
 	return step_list
 
-
+"""
 def main():
 	step = [0 for i in range(num_actions)] + [0, 0] + [0 for i in range(num_ingredients)]
 	step[28] = 1  # fill
@@ -72,3 +71,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+"""

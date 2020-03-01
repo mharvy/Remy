@@ -1,4 +1,4 @@
-from recipe_steps import write_steps
+from fractions import Fraction
 
 vegetables = {"bok choy" : 0, "bean" : 1, "sorrel leaves" : 2, "rocket leaves" : 3, "drumstick" : 4, "tomato" : 5, "kaffir lime" : 6, "plantain" : 7, "turnip" : 8, "sweet potato" : 9, "round gourd" : 10, "ridge gourd": 11, "pimiento": 12, "spinach" : 13, "onion" : 14, "mustard leaves" : 15, "mushroom" : 16, "radish" : 17, "shallots" : 18, "lettuce" : 19, "leek" : 20, "pumpkin" : 21, "yam" : 22, "jalapeno" : 23, "jackfruit" : 24, "horseradish" : 25, "spring onion" : 26, "peas" : 27, "chiles" : 28, "gherkin" : 29, "garlic" : 30, "fenugreek" : 31, "cucumber" : 32, "zucchini" : 33, "corn" : 34, "celery":35,"cauliflower":36,"carrot":37,"capers":38,"broccoli":39,"lotus":40,"bell pepper":41,"beetroot":42,"cabbage":43,"avocado":44,"eggplant":45,"asparagus":46,"artichoke":47,"potato":48,"ginger":49,"potatoes":50,"sweet potatoes":51,"tomatoes":52,"kale":53,"shallot":54,"squash":55}
 spices_herbs = {"chives":0,"galangal":1,"sage":2,"rosemary":3,"oregano":4,"nasturtium":5,"salt":6,"mustard":7,"paprika":8,"mint":9,"marjoram":10,"lemongrass":11,"saffron":12,"nutmeg":13,"herbs":14,"thyme":15,"turmeric":16,"fennel":17,"dill":18,"cumin":19,"coriander":20,"cloves":21,"cinnamon":22,"cayenne":23,"caraway":24,"cajun":25,"pepper":26,"bay leaf":27,"basil":28,"parsley":29,"cilantro":30,"italian seasoning":31,"tarragon":32,"masala":33,"pesto":34,"curry powder":35}
@@ -47,21 +47,7 @@ def recipes():
     recipe_ingredients_info = []
     recipe_steps_info = []
 
-
-    steps_1 = steps_lines[0].split('@')[:-1]
-    for stepp in steps_1:
-        print(stepp)
-    print('\n')
-    steps_2 = steps_lines[1].split('@')[:-1]
-    for stepp in steps_2:
-        print(stepp)
-    print('\n')
-    steps_3 = steps_lines[2].split('@')[:-1]
-    for stepp in steps_3:
-        print(stepp)
-    print('\n')
-
-    for line_i in range(3):
+    for line_i in range(len(ingredients_lines)):
         ingredients = ingredients_lines[line_i].split('~')[:-1]
         steps = steps_lines[line_i].split('@')[:-1]
         for step_i in range(len(steps)):
@@ -70,27 +56,8 @@ def recipes():
                 if step_i + 1 < len(steps):
                     temp = steps[step_i + 1:]
                 steps = steps[:step_i] + steps[step_i].split(';') + temp
-        """
-        for step_i in range(len(steps)):
-            # check for 1st action
-            action_word_indices = []
-            words = steps[step_i].split(' ')
-            for word_i in range(len(words)):
-                word = words[word_i].lower()
-                if word in actions.keys():
-                    action_word_indices.append(word_i)
-                elif word[:-1] in actions.keys():
-                    action_word_indices.append(word_i)
-        if len(action_word_indices) == 2:
-            steps[:action_word_indices[1]]
-            steps[action_word_indices[1]:]
-        """
-
-
-
         steps_info = []
         for step in steps:
-            print(step)
             # check if we've already reached max steps
             if len(steps_info) == 10*(num_actions + 2 + num_ingredients):
                 break
@@ -110,7 +77,8 @@ def recipes():
                 elif word[:-1] in actions.keys(): # check w/o comma, semi-colon, or any punctation
                     action = word[:-1]
                     break
-            action_one_hot[actions[action]] = 1
+            if action != '':
+                action_one_hot[actions[action]] = 1
             # check temperature if appropriate action word
             if action == 'preheat' or action == 'heat':
                 for word in words: # check for single temp words: '375' or '425'
@@ -132,13 +100,13 @@ def recipes():
                     if not c.isdigit():
                         is_numeral = 0
                 if is_numeral:
-                    if words[word_i].lower() in time_units:
+                    if len(words[word_i-1]) > 0 and words[word_i].lower() in time_units:
                         time = int(words[word_i - 1])
                         if words[word_i].lower() == 'minute' or words[word_i].lower() == 'minutes':
                             time *= 60
                         elif words[word_i].lower() == 'hour' or words[word_i].lower() == 'hours':
                             time *= 3600
-                    elif words[word_i][:-1].lower() in time_units:
+                    elif len(words[word_i-1]) > 0 and words[word_i][:-1].lower() in time_units:
                         time = int(words[word_i - 1])
                         if words[word_i][:-1].lower() == 'minute' or words[word_i][:-1].lower() == 'minutes':
                             time *= 60
@@ -175,34 +143,151 @@ def recipes():
             steps_info += action_one_hot + [temperature/MAX_TEMPERATURE, time/MAX_TIME] + ingredients_one_hot
         while len(steps_info) < 10*(num_actions + 2 + num_ingredients):
             steps_info += [0 for _ in range(num_actions + 2 + num_ingredients)]
-        """
-        ingredients_info = []
-        for ingredients in ingredi
-        """
-
-
-
-
         
-        recipe_steps_info.append(steps_info)
-    return recipe_steps_info
+        ingredients_info = []
+        for ingredient in ingredients:
+            # check if we've already reached max steps
+            if len(ingredients_info) == 10*(num_attributes + MAX_ID_COUNT + 1):
+                break
+            # elements in ingredients
+            attribute = [0 for _ in range(num_attributes)]
+            id = [0 for _ in range(MAX_ID_COUNT)]
+            quantity = temp = conversion = 0
+
+            # divide into sub ingredients
+            sub_ingredients = ingredient.split(' ')
+
+            starts_with_number = 1
+            for c in sub_ingredients[0]:
+                if not c.isdigit():
+                    starts_with_number = 0
+            if len(sub_ingredients[0]) >= 1 and starts_with_number:
+                temp += int(sub_ingredients[0])
+                # handles fractions
+                if len(sub_ingredients) > 1: # if theres a second element, lets analyze
+                    # if #/#
+                    if len(sub_ingredients[1]) == 3 and sub_ingredients[1][0].isdigit and sub_ingredients[1][1] == '/' and sub_ingredients[1][2].isdigit:
+                        temp += float(Fraction(sub_ingredients[1]))
+                        #conversions take place where, find the unit that follows the integer index 0 and fraction index 1
+                        if sub_ingredients[2] == "pound" or sub_ingredients[2] == "pounds" or sub_ingredients[2] == "lb." or sub_ingredients[2] == "lb" or sub_ingredients[2] == "lbs" or sub_ingredients[2] == "lbs":
+                            conversion = temp * lbs_to_cups
+                        elif sub_ingredients[2] == "ounce" or sub_ingredients[2] == "ounces" or sub_ingredients[2] == "oz" or sub_ingredients[2] == "oz.":
+                            conversion = temp * ozs_to_cups
+                        elif sub_ingredients[2] == "head" or sub_ingredients[2] == "heads":
+                            conversion = temp * heads_to_cups
+                        elif sub_ingredients[2] == "teaspoon" or sub_ingredients[2] == "teaspoons" or sub_ingredients[2] == "tsp" or sub_ingredients[2] == "tsp.":
+                            conversion = temp * teasp_to_cups
+                        elif sub_ingredients[2] == "tablespoon" or sub_ingredients[2] == "tablespoons" or sub_ingredients[2] == "tbspn":
+                            conversion = temp * tablesp_to_cups
+                        elif sub_ingredients[2] == "cup" or sub_ingredients[2] == "cups":
+                            conversion = temp
+                    #handles the special cases of the (xx ounces)
+                    elif sub_ingredients[1][0] == '(' and len(sub_ingredients[1]) == 3:
+                        #if this happens, we already have added '1' so we should get the correct value
+                        if sub_ingredients[1][1].isdigit and sub_ingredients[1][2].isdigit:
+                            temp = float(sub_ingredients[1][1:3])
+                            conversion = temp * ozs_to_cups
+                    #handles the special cases of the (.xx ounces)        
+                    elif sub_ingredients[1][0] == '(' and sub_ingredients[1][1] == '.' and len(sub_ingredients[1]) > 3:
+                            temp = float(sub_ingredients[1][2:4])
+                            conversion = temp * ozs_to_cups
+                    #handles the special cases of the (xx.xx ounces)
+                    elif sub_ingredients[1][0] == '(' and len(sub_ingredients[1]) == 6:
+                            temp = float(sub_ingredients[1][2:6])
+                            conversion = temp * ozs_to_cups
+                    # handles case where it is just 1 tablespoon, etc
+                    elif sub_ingredients[1] == "pound" or sub_ingredients[1] == "pounds" or sub_ingredients[1] == "lb." or sub_ingredients[1] == "lb" or sub_ingredients[1] == "lbs" or sub_ingredients[1] == "lbs":
+                        conversion = temp * lbs_to_cups
+                    elif sub_ingredients[1] == "ounce" or sub_ingredients[1] == "ounces" or sub_ingredients[1] == "oz" or sub_ingredients[1] == "oz.":
+                        conversion = temp * ozs_to_cups
+                    elif sub_ingredients[1] == "head" or sub_ingredients[1] == "heads":
+                        conversion = temp * heads_to_cups
+                    elif sub_ingredients[1] == "teaspoon" or sub_ingredients[1] == "teaspoons" or sub_ingredients[1] == "tsp" or sub_ingredients[1] == "tsp.":
+                        conversion = temp * teasp_to_cups
+                    elif sub_ingredients[1] == "tablespoon" or sub_ingredients[1] == "tablespoons" or sub_ingredients[1] == "tbspn":
+                        conversion = temp * tablesp_to_cups
+                    elif sub_ingredients[1] == "cup" or sub_ingredients[1] == "cups":
+                        conversion = temp
+                    # otherwise you have one/two/tree whole:
+                    else:
+                        conversion = temp
+            #handles the fraction as the first index
+            elif len(sub_ingredients[0]) == 3 and len(sub_ingredients) > 1 and sub_ingredients[0][0].isdigit and sub_ingredients[0][1] == '/' and sub_ingredients[0][2].isdigit:
+                temp += float(Fraction(sub_ingredients[0]))
+                #check to see what the units that follow the fraction from index of 0
+                if sub_ingredients[1] == "pound" or sub_ingredients[1] == "pounds" or sub_ingredients[1] == "lb." or sub_ingredients[1] == "lb" or sub_ingredients[1] == "lbs" or sub_ingredients[1] == "lbs":
+                    conversion = temp * lbs_to_cups
+                elif sub_ingredients[1] == "ounce" or sub_ingredients[1] == "ounces" or sub_ingredients[1] == "oz" or sub_ingredients[1] == "oz.":
+                    conversion = temp * ozs_to_cups
+                elif sub_ingredients[1] == "head" or sub_ingredients[1] == "heads":
+                    conversion = temp * heads_to_cups
+                elif sub_ingredients[1] == "teaspoon" or sub_ingredients[1] == "teaspoons" or sub_ingredients[1] == "tsp" or sub_ingredients[1] == "tsp.":
+                    conversion = temp * teasp_to_cups
+                elif sub_ingredients[1] == "tablespoon" or sub_ingredients[1] == "tablespoons" or sub_ingredients[1] == "tbspn":
+                    conversion = temp * tablesp_to_cups
+                elif sub_ingredients[1] == "cup" or sub_ingredients[1] == "cups":
+                    conversion = temp
+                # otherwise you have one half whole
+                else:
+                    conversion = temp
+            quantity = conversion
+            # now we've found quantity (not normalized yet)
+            #
+            for i in range(len(sub_ingredients)):
+                sub_ingredients[i] = sub_ingredients[i].lower()
+            # check for word matches
+            for sub_ingredient in sub_ingredients:
+                for food_type_i in range(len(ingredients_list)):
+                    if sub_ingredient in ingredients_list[food_type_i].keys():
+                        attribute[food_type_i] = 1
+                        id[ingredients_list[food_type_i][sub_ingredient]] = 1
+                    # remove end character (could be ',' or 's')
+                    elif len(sub_ingredient) >= 1 and sub_ingredient[:-1] in ingredients_list[food_type_i].keys():
+                        attribute[food_type_i] = 1
+                        id[ingredients_list[food_type_i][sub_ingredient[:-1]]] = 1
+                    # remove 2 end characters (could be 's,')
+                    elif len(sub_ingredient) > 1 and sub_ingredient[:-2] in ingredients_list[food_type_i].keys():
+                        attribute[food_type_i] = 1
+                        id[ingredients_list[food_type_i][sub_ingredient[:-2]]] = 1
+            # if more than one word, check for any matching bi-grams in ingredients_list
+            if len(sub_ingredients) > 1:
+                for sub_ingre_index in range(1, len(sub_ingredients)):
+                    bigram = sub_ingredients[sub_ingre_index - 1] + ' ' + sub_ingredients[sub_ingre_index]
+                    for food_type_i in range(len(ingredients_list)):
+                        if bigram in ingredients_list[food_type_i].keys():
+                            attribute[food_type_i] = 1
+                            id[ingredients_list[food_type_i][bigram]] = 1
+                        # remove end character, could be ',' or 's'
+                        elif bigram[:-1] in ingredients_list[food_type_i].keys():
+                            attribute[food_type_i] = 1
+                            id[ingredients_list[food_type_i][bigram[:-1]]] = 1
+                        # remove 2 end characters, could be 's,'
+                        elif len(bigram) > 1 and bigram[:-2] in ingredients_list[food_type_i].keys():
+                            attribute[food_type_i] = 1
+                            id[ingredients_list[food_type_i][bigram[:-2]]] = 1
+            # if it hasn't found a matching ingredient, :(
+            found_ingred = 0
+            for a in attribute:
+                if a:
+                    found_ingred = 1
+                    ingredients_info += attribute + id + [quantity/MAX_QUANTITY]
+        while len(ingredients_info) < 10*(num_attributes + MAX_ID_COUNT + 1):
+            ingredients_info += [0 for _ in range(num_attributes + MAX_ID_COUNT + 1)]
+        if found_ingred: 
+            recipe_ingredients_info.append(ingredients_info)
+            recipe_steps_info.append(steps_info)
+    return recipe_ingredients_info, recipe_steps_info
 
 
-def main():
-    recipe_steps_info = recipes()
+
+    #for recipe in recipe_ingredients_info:
+        #print(len(recipe))
     #for offset in range(0,3579,358):
     #    print('\n')
     #    print(recipe_steps_info[0][offset:offset+num_actions])
     #    print(recipe_steps_info[0][offset+num_actions])
     #    print(recipe_steps_info[0][offset+num_actions+1])
     #    print(recipe_steps_info[0][num_actions+offset+2:])
-    for i in range(3):
-        steps = write_steps(recipe_steps_info[i])
-        for step in steps:
-            print(step)
-
-if __name__ == "__main__":
-    main()
 
 
 
