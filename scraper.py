@@ -9,6 +9,7 @@ def worm(starting_URL):
 	visited.add(starting_URL)
 
 	ingredients_list = open("ingredients.txt","a")
+	steps_list = open("steps.txt","a")
 	lists_written = 0
 
 	while len(URLs) != 0:
@@ -16,13 +17,20 @@ def worm(starting_URL):
 
 		# start of brennen code
 		ingredients = []
-		result = requests.get(URL)
+		steps = []
+		try:
+			result = requests.get(URL)
+		except:
+			print("Request was denied :(")
+			continue
+		
 		src = result.content
 
 		soup = BeautifulSoup(src, 'lxml')
-		lists = soup.find_all("ul")
+		# find ingredients
+		unordered_lists = soup.find_all("ul")
 
-		for ls in lists:
+		for ls in unordered_lists:
 			try:
 				if "lst_ingredients" in ls.attrs['id']:
 					for ingredient in ls.find_all("span"):
@@ -30,12 +38,34 @@ def worm(starting_URL):
 							ingredients.append(ingredient.get_text())
 			except:
 				continue
-		if len(ingredients) != 0:
+		# find steps
+		ordered_lists = soup.find_all("ol")
+		for ls in ordered_lists:
+			try:
+				if "recipeInstructions" in ls.attrs['itemprop']:
+					for step in ls.find_all('span'):
+						formatted_steps = step.get_text().strip().split('.')
+						
+						for sub_step in formatted_steps:
+							if len(sub_step) != 0:
+								if sub_step[0] == ' ': # if begins with space, chop off
+									steps.append(sub_step[1:])
+								else:
+									steps.append(sub_step)
+			except:
+				continue
+
+		# add steps and ingredients to files
+		if len(ingredients) != 0 and len(steps) != 0:
 			lists_written += 1
 			print(f"Recipes written: {lists_written}")
 			for ingredient in ingredients:
 				ingredients_list.write(ingredient + "~")
 			ingredients_list.write("\n")
+			for step in steps:
+				steps_list.write(step + "@")
+			steps_list.write("\n")
+			
 		# end of brennen code
 
 		page = requests.get(URL)
