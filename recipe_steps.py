@@ -19,7 +19,7 @@ def write_steps(float_array):
 			if float_array[step * LENGTH + i] == 1:
 				for action in actions.items():
 					if action[1] == i:
-						cur_str += action[0] + " "
+						cur_str += action[0]
 
 		# Get ingredients
 		for i in range(num_ingredients):
@@ -28,8 +28,10 @@ def write_steps(float_array):
 				for ingredients in all_ingredients:
 					for ingredient in ingredients.items():
 						if (ingredient[1] + marc_is_cool) == i:
-							cur_str += ingredient[0] + ", "
+							cur_str += " " + ingredient[0] + ","
 					marc_is_cool += len(ingredients)
+
+		cur_str = cur_str[:-1]
 
 		# Get temp
 		if float_array[step * LENGTH + num_actions] != 0:
@@ -38,11 +40,16 @@ def write_steps(float_array):
 			for t in temp_.items():
 				if t[1] == temp_int:
 					temp = t[0]
-			cur_str += "at " + temp + " degrees Fahrenheit "
+			if temp not in ["medium-high", "high heat", "medium heat", "low heat", "medium-low"]:
+				suffix = " degrees Fahrenheit"
+			else:
+				suffix = ""
+			cur_str += " at " + temp + suffix
 
 		# Get time
 		if float_array[step * LENGTH + num_actions + 1] != 0:
-			cur_str += "for " + str(float_array[step * LENGTH + num_actions + 1] * max_seconds // 60) + " minutes"
+			cur_str += " for " + str(float_array[step * LENGTH + num_actions + 1] * max_seconds // 60) + " minutes"
+
 
 		step_list.append(cur_str + ".")
 
