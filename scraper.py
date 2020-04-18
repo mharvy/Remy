@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import heapq
 import sys
+from enumerator2 import *
 
 
 def worm(starting_URL, ingredients_out, steps_out):
@@ -40,14 +41,27 @@ def worm(starting_URL, ingredients_out, steps_out):
                             ingredients.append(ingredient.get_text())
             except:
                 continue
+
         # find steps
         ordered_lists = soup.find_all("ol")
         for ls in ordered_lists:
             try:
                 if "recipeInstructions" in ls.attrs['itemprop']:
                     for step in ls.find_all('span'):
-                        formatted_steps = step.get_text().strip().split('.')
-                        
+
+                        formatted_steps = [""]
+                        for s in step.get_text().lower().strip().split(' '):
+                            for char in s:
+                                if char in " .,!;:":
+                                    s = s.replace(char, '')
+
+                            if s in actions:
+                                formatted_steps.append("")
+                            formatted_steps[-1] += (s + " ")
+
+
+                        formatted_steps.remove("")
+
                         for sub_step in formatted_steps:
                             if len(sub_step) != 0:
                                 if sub_step[0] == ' ': # if begins with space, chop off
