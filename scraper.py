@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import heapq
 import sys
 from enumerator2 import *
+from time import sleep
 
 
 def worm(starting_URL, ingredients_out, steps_out):
@@ -15,9 +16,10 @@ def worm(starting_URL, ingredients_out, steps_out):
     lists_written = 0
 
     while len(URLs) != 0:
-        URL = URLs.pop()
 
-        # start of brennen code
+        URL = URLs.pop()
+        failed = False
+
         ingredients = []
         steps = []
         try:
@@ -51,6 +53,10 @@ def worm(starting_URL, ingredients_out, steps_out):
 
                         formatted_steps = [""]
                         for s in step.get_text().lower().strip().split(' '):
+                            if "\n" in s:
+                                failed = True
+                                break
+
                             for char in s:
                                 if char in " .,!;:":
                                     s = s.replace(char, '')
@@ -72,13 +78,15 @@ def worm(starting_URL, ingredients_out, steps_out):
                 continue
 
         # add steps and ingredients to files
-        if len(ingredients) != 0 and len(steps) != 0:
+        if len(ingredients) != 0 and len(steps) != 0 and not failed:
             lists_written += 1
             print(f"Recipes written: {lists_written}")
             for ingredient in ingredients:
                 ingredients_list.write(ingredient + "~")
             ingredients_list.write("\n")
             for step in steps:
+                if "\n" in step:
+                    print("ALERT: here is the step %s" % step)
                 steps_list.write(step + "@")
             steps_list.write("\n")
 

@@ -7,7 +7,7 @@ spices_herbs = {"chives":0,"galangal":1,"sage":2,"rosemary":3,"oregano":4,"nastu
 cereals_pulses = {"flour":0,"amaranth":1,"oats":2,"jowar":3,"brown rice":4,"tapioca":5,"puffed rice":6,"kidney beans":7,"lentils":8,"couscous":9,"cornmeal":10,"breadcrumbs":11,"bread":12,"black beans":13,"chickpeas":14,"basmati rice":15,"barley":16,"millet":17,"bean sprouts":18}
 meats = {"beef":0,"chicken":1,"turkey":2,"pork":3,"partridge":4,"stock":5,"liver":6,"ham":7,"crab":8,"chicken stock":9,"chops":10,"lamb":11,"venison":12,"sausage":13,"bacon":14,"mutton":15,"quail":16}
 dairy = {"gruyere cheese":0,"gouda cheese":1,"feta cheese":2,"milk":3,"brie cheese":4,"cream cheese":5,"ricotta cheese":6,"parmesan cheese":7,"blue cheese":8,"cheddar":9,"cream":10,"provolone":11,"mozzarella":12,"yogurt":13,"cottage cheese":14,"condensed milk":15,"butter":16,"margarine":17,"buttermilk":18}
-fruits = {"cranberries":0,"kiwi":1,"blueberries":2,"mango":3,"watermelon":4,"strawberry":5,"water chestnut":6,"papaya":7,"orange":8,"olive":9,"pear":10,"mulberries":11,"lemon juice":12,"lemon":13,"raisins":14,"tamarind":15,"grapefruit":16,"gooseberries":17,"dates":18,"apple":19,"apples":20,"coconut":21,"cherries":22,"cherry":23,"banana":24,"pear":25,"apricot":26,"grapes":27,"pomegranate":28,"pineapple":29,"fig":30,"guava":31,"plum":32,"strawberries":33,"raspberries":34,"blackberries":35,"lime":36,"berries":37,"peach":38}
+fruits = {"cranberr":0,"kiwi":1,"blueberr":2,"mango":3,"watermelon":4,"strawberr":5,"water chestnut":6,"papaya":7,"orange":8,"olive":9,"pear":10,"mulberr":11,"lemon juice":12,"lemon":13,"raisins":14,"tamarind":15,"grapefruit":16,"gooseberr":17,"dates":18,"apple":19,"apples":20,"coconut":21,"cherries":22,"cherry":23,"banana":24,"apricot":25,"grapes":26,"pomegranate":27,"pineapple":28,"fig":29,"guava":30,"plum":31,"raspberr":32,"blackberr":33,"lime":34,"berr":35,"peach":36}
 seafood = {"shrimp":0,"tuna fish":1,"shellfish":2,"shark":3,"sardine":4,"salmon":5,"prawns":6,"pomfret":7,"perch":8,"mussel":9,"mullet":10,"squid":11,"haddock":12,"flounder":13,"fish":14,"fish filet":15,"cod":16,"clam":17,"cat fish":18,"mackeral":19,"anchovies":20}
 sugar_products = {"brown sugar":0,"sugar candy":1,"confectionary sugar":2,"powdered sugar":3,"icing sugar":4,"honey":5,"jaggery":6,"syrup":7,"sugar":8,"cane sugar":9,"caramel":10,"castor sugar":11,"white sugar":12}
 nuts_oils = {"canola oil":0,"cooking spray":1,"chia seeds":2,"hazelnut":3,"pine nuts":4,"mustard oil":5,"sunflower seeds":6,"sesame oil":7,"pistachio":8,"olive oil":9,"mustard seeds":10,"poppy seeds":11,"sesame seeds":12,"peanuts":13,"chironji":14,"cashew":15,"almond":16,"walnuts":17,"walnunts":18,"pecan":19,"baking spray":20}
@@ -356,7 +356,8 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
             recipe_steps_info.append(steps_info)
 
     # Remove old output file
-    os.remove(recipes_out)
+    if os.path.exists(recipes_out):
+        os.remove(recipes_out)
 
     # Write 1 encoded recipe per line to new file
     with open(recipes_out, "a") as recipes:
