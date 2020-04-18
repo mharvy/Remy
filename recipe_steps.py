@@ -43,7 +43,7 @@ def write_steps(float_array):
 					temp = t[0]
 			if temp in ['300', '325', '350', '375', '400', '425', '450', '475', '500', '525', '550']:
 				suffix = " degrees Fahrenheit"
-				prefix = " at"
+				prefix = " at "
 			elif temp in ['medium-high', 'high heat', 'medium heat', 'low heat', 'medium-low']:
 				suffix = ""
 				prefix = " at "
