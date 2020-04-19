@@ -6,19 +6,27 @@ from enumerator2 import *
 from time import sleep
 
 
-def worm(starting_URL, ingredients_out, steps_out):
+def worm(starting_URL, ingredients_out, steps_out, visited_urls):
     URLs = [starting_URL]
     visited = set()
     visited.add(starting_URL)
 
     ingredients_list = open(ingredients_out,"a")
     steps_list = open(steps_out,"a")
+    visited_urls_list = open(visited_urls, "a")
     lists_written = 0
+
+    # Start where we left off
+    with open(visited_urls, "r") as old_urls:
+        for line in old_urls.readlines():
+            print(line[:-1])
+            visited.add(line[:-1])  # Don't add newline!
 
     while len(URLs) != 0:
 
         URL = URLs.pop()
         failed = False
+        visited_urls_list.write(URL + "\n")
 
         ingredients = []
         steps = []
@@ -117,13 +125,12 @@ def worm(starting_URL, ingredients_out, steps_out):
                             visited.add(new_URL)
 
 
-
 def main():
     #starting_url = "https://www.allrecipes.com/recipe/257611/cauliflower-chicken-fried-rice/"
     #ingredients_out = "recipes/ingredients.txt"
     #steps_out = "recipes/steps.txt"
 
-    worm(sys.argv[1], sys.argv[2], sys.argv[3])
+    worm(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 
 
 if __name__ == "__main__":
