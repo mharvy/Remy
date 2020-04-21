@@ -56,9 +56,9 @@ def worm(starting_URL, ingredients_out, steps_out, visited_urls):
         ordered_lists = soup.find_all("ol")
         for ls in ordered_lists:
             try:
+
                 if "recipeInstructions" in ls.attrs['itemprop']:
                     for step in ls.find_all('span'):
-
                         formatted_steps = [""]
                         for s in step.get_text().lower().strip().split(' '):
                             if "\n" in s:
@@ -73,16 +73,16 @@ def worm(starting_URL, ingredients_out, steps_out, visited_urls):
                                 formatted_steps.append("")
                             formatted_steps[-1] += (s + " ")
 
-
-                        formatted_steps.remove("")
-
+                        if "" in formatted_steps:
+                            formatted_steps.remove("")
                         for sub_step in formatted_steps:
                             if len(sub_step) != 0:
                                 if sub_step[0] == ' ': # if begins with space, chop off
                                     steps.append(sub_step[1:])
                                 else:
                                     steps.append(sub_step)
-            except:
+            except Exception as e:
+                print(e)
                 continue
 
         # add steps and ingredients to files
