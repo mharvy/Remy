@@ -2,7 +2,7 @@ from fractions import Fraction
 import os
 import sys
 
-vegetables = {"bok choy" : 0, "bean" : 1, "sorrel leaves" : 2, "rocket leaves" : 3, "drumstick" : 4, "tomato" : 5, "kaffir lime" : 6, "plantain" : 7, "turnip" : 8, "sweet potato" : 9, "round gourd" : 10, "ridge gourd": 11, "pimiento": 12, "spinach" : 13, "onion" : 14, "mustard leaves" : 15, "mushroom" : 16, "radish" : 17, "shallots" : 18, "lettuce" : 19, "leek" : 20, "pumpkin" : 21, "yam" : 22, "jalapeno" : 23, "jackfruit" : 24, "horseradish" : 25, "spring onion" : 26, "peas" : 27, "chiles" : 28, "gherkin" : 29, "garlic" : 30, "fenugreek" : 31, "cucumber" : 32, "zucchini" : 33, "corn" : 34, "celery":35,"cauliflower":36,"carrot":37,"capers":38,"broccoli":39,"lotus":40,"bell pepper":41,"beetroot":42,"cabbage":43,"avocado":44,"eggplant":45,"asparagus":46,"artichoke":47,"potato":48,"ginger":49,"kale":50,"shallot":51,"squash":52, "cayenne pepper": 53}
+vegetables = {"bok choy" : 0, "bean" : 1, "sorrel leaves" : 2, "rocket leaves" : 3, "drumstick" : 4, "tomato" : 5, "kaffir lime" : 6, "plantain" : 7, "turnip" : 8, "sweet potato" : 9, "round gourd" : 10, "ridge gourd": 11, "pimiento": 12, "spinach" : 13, "onion" : 14, "mustard leaves" : 15, "mushroom" : 16, "radish" : 17, "shallots" : 18, "lettuce" : 19, "leek" : 20, "pumpkin" : 21, "yam" : 22, "jalapeno" : 23, "jackfruit" : 24, "horseradish" : 25, "spring onion" : 26, "peas" : 27, "chiles" : 28, "gherkin" : 29, "garlic" : 30, "fenugreek" : 31, "cucumber" : 32, "zucchini" : 33, "corn" : 34, "celery":35,"cauliflower":36,"carrot":37,"capers":38,"broccoli":39,"lotus":40,"bell pepper":41,"beetroot":42,"cabbage":43,"avocado":44,"eggplant":45,"asparagus":46,"artichoke":47,"potato":48,"ginger":49,"kale":50,"shallot":51,"squash":52, "cayenne pepper": 53, "beet": 54}
 spices_herbs = {"chives":0,"galangal":1,"sage":2,"rosemary":3,"oregano":4,"nasturtium":5,"salt":6,"mustard":7,"paprika":8,"mint":9,"marjoram":10,"lemongrass":11,"saffron":12,"nutmeg":13,"herbs":14,"thyme":15,"turmeric":16,"fennel":17,"dill":18,"cumin":19,"coriander":20,"cloves":21,"cinnamon":22,"cayenne":23,"caraway":24,"cajun":25,"pepper":26,"bay leaf":27,"basil":28,"parsley":29,"cilantro":30,"italian seasoning":31,"tarragon":32,"masala":33,"pesto":34,"curry powder":35}
 cereals_pulses = {"flour":0,"amaranth":1,"oats":2,"jowar":3,"brown rice":4,"tapioca":5,"puffed rice":6,"kidney beans":7,"lentils":8,"couscous":9,"cornmeal":10,"breadcrumbs":11,"bread":12,"black beans":13,"chickpeas":14,"basmati rice":15,"barley":16,"millet":17,"bean sprouts":18}
 meats = {"beef":0,"chicken":1,"turkey":2,"pork":3,"partridge":4,"stock":5,"liver":6,"ham":7,"crab":8,"chicken stock":9,"chops":10,"lamb":11,"venison":12,"sausage":13,"bacon":14,"mutton":15,"quail":16}
@@ -133,7 +133,7 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
             blacklist = []
             if len(words) > 1:
                 for f_i in range(num_ingredients):
-                    for word_i in range(1,len(words)):
+                    for word_i in range(1,len(words))[::-1]:
                         bigram = words[word_i-1] + ' ' + words[word_i]
                         if bigram == all_ingredients[f_i]:
                             ingredients_one_hot[f_i] = 1
@@ -150,7 +150,7 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
 
             # finally, check for ingredients
             for f_i in range(num_ingredients): 
-                for word_i in range(len(words)):
+                for word_i in range(len(words))[::-1]:
                     if word_i in blacklist:
                         continue
                     word = words[word_i].lower()
@@ -270,27 +270,39 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
                 sub_ingredients[i] = sub_ingredients[i].lower()
 
             # check for word matches
-            for sub_ingredient in sub_ingredients:
+            for sub_ingredient in sub_ingredients[::-1]:
+                done = False
                 for food_type_i in range(len(ingredients_list)):
                     if sub_ingredient in ingredients_list[food_type_i].keys():
                         attribute[food_type_i] = 1
                         id[ingredients_list[food_type_i][sub_ingredient]] = 1
+                        done = True
+                        break
                     # remove end character (could be ',' or 's')
-                    elif len(sub_ingredient) >= 1 and sub_ingredient[:-1] in ingredients_list[food_type_i].keys():
+                    elif len(sub_ingredient) > 0 and sub_ingredient[:-1] in ingredients_list[food_type_i].keys():
                         attribute[food_type_i] = 1
                         id[ingredients_list[food_type_i][sub_ingredient[:-1]]] = 1
+                        done = True
+                        break
                     # remove 2 end characters (could be 's,')
                     elif len(sub_ingredient) > 1 and sub_ingredient[:-2] in ingredients_list[food_type_i].keys():
                         attribute[food_type_i] = 1
                         id[ingredients_list[food_type_i][sub_ingredient[:-2]]] = 1
+                        done = True
+                        break
                         # remove 2 end characters (could be 'es,')
                     elif len(sub_ingredient) > 2 and sub_ingredient[:-3] in ingredients_list[food_type_i].keys():
                         attribute[food_type_i] = 1
                         id[ingredients_list[food_type_i][sub_ingredient[:-3]]] = 1
+                        done = True
+                        break
+                if done:
+                    break
 
             # if more than one word, check for any matching bi-grams in ingredients_list
             if len(sub_ingredients) > 1:
-                for sub_ingre_index in range(1, len(sub_ingredients)):
+                for sub_ingre_index in range(1, len(sub_ingredients))[::-1]:
+                    done = False
                     bigram = sub_ingredients[sub_ingre_index - 1] + ' ' + sub_ingredients[sub_ingre_index]
                     for food_type_i in range(len(ingredients_list)):
                         if bigram in ingredients_list[food_type_i].keys():
@@ -300,6 +312,10 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
                             
                             attribute[food_type_i] = 1
                             id[ingredients_list[food_type_i][bigram]] = 1
+
+                            done = True
+                            break
+
                         # remove end character, could be ',' or 's'
                         elif bigram[:-1] in ingredients_list[food_type_i].keys():
                             # Clear any 1-word finds
@@ -308,6 +324,10 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
 
                             attribute[food_type_i] = 1
                             id[ingredients_list[food_type_i][bigram[:-1]]] = 1
+
+                            done = True
+                            break
+
                         # remove 2 end characters, could be 's,'
                         elif len(bigram) > 1 and bigram[:-2] in ingredients_list[food_type_i].keys():
                             # Clear any 1-word finds
@@ -316,6 +336,10 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
 
                             attribute[food_type_i] = 1
                             id[ingredients_list[food_type_i][bigram[:-2]]] = 1
+
+                            done = True
+                            break
+
                         # remove 3 end characters, could be 's,'
                         elif len(bigram) > 2 and bigram[:-3] in ingredients_list[food_type_i].keys():
                             # Clear any 1-word finds
@@ -324,6 +348,12 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
 
                             attribute[food_type_i] = 1
                             id[ingredients_list[food_type_i][bigram[:-3]]] = 1
+
+                            done = True
+                            break
+
+                    if done:
+                        break
 
             # Check for special cases
 
@@ -334,7 +364,7 @@ def encode_recipes(ingredients_in, steps_in, recipes_out):
                 id = [0 for i in id]
 
                 attribute[9] = 1
-                id[ingredients_list[food_type_i]['salt and pepper']] = 1
+                id[ingredients_list[9]['salt and pepper']] = 1
 
             # if it hasn't found a matching ingredient, :(
             found_ingred = 0
