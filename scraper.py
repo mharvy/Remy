@@ -60,7 +60,11 @@ def worm(starting_URL, ingredients_out, steps_out, visited_urls):
                 if "recipeInstructions" in ls.attrs['itemprop']:
                     for step in ls.find_all('span'):
                         formatted_steps = [""]
-                        for s in step.get_text().lower().strip().split(' '):
+                        step_string = step.get_text().lower().strip()
+                        step_string = step_string.replace("high heat", "high-heat")
+                        step_string = step_string.replace("medium heat", "medium-heat")
+                        step_string = step_string.replace("low heat", "low-heat")
+                        for s in step_string.split(" "):
                             if "\n" in s:
                                 failed = True
                                 break
