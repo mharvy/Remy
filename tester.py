@@ -1,8 +1,9 @@
 from recipe_ingredients import write_ingredients
 from recipe_steps import write_steps
 import sys
+from nn import INGREDIENTS, INGREDIENTS_SPACE
 
-def main():
+def print_recipe():
 
     # sys.argv[1] = "recipes/encoded.txt"
 
@@ -13,12 +14,12 @@ def main():
             print(count)
             str_list = line.split(",")
             float_list = [float(s) for s in str_list]
-            for f in write_ingredients(float_list[:880])[0]:
+            for f in write_ingredients(float_list[:INGREDIENTS * INGREDIENTS_SPACE])[0]:
                 print(f)
-            for f in write_steps(float_list[880:]):
+            for f in write_steps(float_list[INGREDIENTS * INGREDIENTS_SPACE:]):
                 print(f)
             print("\n")
             count += 1
         
 if __name__ == "__main__":
-    main()
+    print_recipe()
