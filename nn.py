@@ -82,7 +82,7 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
     fake_label = 0
 
     optimizerD = optim.Adam(discriminator.parameters(), lr=lr, weight_decay=0)
-    optimizerG = optim.Adam(generator.parameters(), lr=lr, weight_decay=0)
+    optimizerG = optim.Adam(generator.parameters(), lr=lr*2, weight_decay=0)
 
     d_losses = []
     g_losses = []
@@ -126,8 +126,11 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
             error_d_real = criterion(output, label)
             error_d_real.backward()
             D_x = output.mean().item()
+            optimizerD.step()
 
             # Train with fake batch
+            discriminator.zero_grad()
+            generator.zero_grad()
             noise = torch.randn(batch_size, 10).cuda()
             fake_out = generator(noise)
             
@@ -144,7 +147,6 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 
             ### Update generator
 
-            generator.zero_grad()
             label.fill_(real_label)
 
             output = discriminator(fake_out).view(-1)
@@ -233,7 +235,7 @@ def fit(lr, epochs, stats_interval, recipe_inteval, train_file, batch_size, out_
 
 
 def main():
-    fit(0.00001, 20000, 1000, 1000, "recipes/encoded.txt", 100, "out.txt")
+    fit(0.000005, 20000, 100, 1000, "recipes/encoded.txt", 100, "out.txt")
 
 
 if __name__ == "__main__":
